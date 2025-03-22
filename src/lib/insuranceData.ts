@@ -14,6 +14,13 @@ export interface Question {
 export const questions: Record<InsuranceType, Question[]> = {
   health: [
     {
+      id: "fullName",
+      text: "What is your full name?",
+      type: "text",
+      placeholder: "Enter your full name",
+      required: true,
+    },
+    {
       id: "age",
       text: "What is your age?",
       type: "number",
@@ -25,6 +32,13 @@ export const questions: Record<InsuranceType, Question[]> = {
       text: "What is your gender?",
       type: "select",
       options: ["Male", "Female", "Other"],
+      required: true,
+    },
+    {
+      id: "contactNumber",
+      text: "What is your contact number?",
+      type: "text",
+      placeholder: "Enter your mobile number",
       required: true,
     },
     {
@@ -35,10 +49,31 @@ export const questions: Record<InsuranceType, Question[]> = {
       required: true,
     },
     {
+      id: "preExistingDetails",
+      text: "If yes, please specify your pre-existing conditions",
+      type: "text",
+      placeholder: "E.g., Diabetes, Hypertension, etc.",
+      required: false,
+    },
+    {
       id: "familySize",
       text: "How many family members do you want to include in your health insurance?",
       type: "number",
       placeholder: "Number of family members",
+      required: true,
+    },
+    {
+      id: "familyAges",
+      text: "What are the ages of your family members? (comma separated)",
+      type: "text",
+      placeholder: "E.g., 35, 32, 10, 7",
+      required: false,
+    },
+    {
+      id: "occupation",
+      text: "What is your occupation?",
+      type: "select",
+      options: ["Salaried", "Self-employed", "Business owner", "Student", "Retired", "Homemaker", "Other"],
       required: true,
     },
     {
@@ -48,8 +83,29 @@ export const questions: Record<InsuranceType, Question[]> = {
       placeholder: "Annual income in lakhs",
       required: true,
     },
+    {
+      id: "coverageAmount",
+      text: "What coverage amount are you looking for (in lakhs)?",
+      type: "select",
+      options: ["2 lakhs", "3 lakhs", "5 lakhs", "10 lakhs", "15 lakhs", "25 lakhs", "50 lakhs", "1 crore+"],
+      required: true,
+    },
+    {
+      id: "maternity",
+      text: "Do you require maternity coverage?",
+      type: "radio",
+      options: ["Yes", "No"],
+      required: true,
+    },
   ],
   term: [
+    {
+      id: "fullName",
+      text: "What is your full name?",
+      type: "text",
+      placeholder: "Enter your full name",
+      required: true,
+    },
     {
       id: "age",
       text: "What is your age?",
@@ -65,6 +121,13 @@ export const questions: Record<InsuranceType, Question[]> = {
       required: true,
     },
     {
+      id: "contactNumber",
+      text: "What is your contact number?",
+      type: "text",
+      placeholder: "Enter your mobile number",
+      required: true,
+    },
+    {
       id: "smoker",
       text: "Are you a smoker?",
       type: "radio",
@@ -72,26 +135,95 @@ export const questions: Record<InsuranceType, Question[]> = {
       required: true,
     },
     {
+      id: "alcoholConsumption",
+      text: "Do you consume alcohol regularly?",
+      type: "radio",
+      options: ["Yes", "No", "Occasionally"],
+      required: true,
+    },
+    {
+      id: "medicalHistory",
+      text: "Do you have any significant medical history?",
+      type: "radio",
+      options: ["Yes", "No"],
+      required: true,
+    },
+    {
+      id: "medicalDetails",
+      text: "If yes, please specify your medical conditions",
+      type: "text",
+      placeholder: "E.g., Heart disease, Cancer, etc.",
+      required: false,
+    },
+    {
+      id: "occupation",
+      text: "What is your occupation?",
+      type: "select",
+      options: ["Salaried", "Self-employed", "Business owner", "Student", "Retired", "Homemaker", "Other"],
+      required: true,
+    },
+    {
+      id: "annualIncome",
+      text: "What is your annual income (in lakhs)?",
+      type: "number",
+      placeholder: "Annual income in lakhs",
+      required: true,
+    },
+    {
       id: "coverageAmount",
       text: "What amount of coverage are you looking for (in lakhs)?",
-      type: "number",
-      placeholder: "Coverage amount in lakhs",
+      type: "select",
+      options: ["25 lakhs", "50 lakhs", "75 lakhs", "1 crore", "2 crore", "5 crore", "10 crore+"],
       required: true,
     },
     {
       id: "termLength",
       text: "For how many years do you want the insurance?",
       type: "select",
-      options: ["10 years", "15 years", "20 years", "25 years", "30 years"],
+      options: ["10 years", "15 years", "20 years", "25 years", "30 years", "Till age 60", "Till age 70"],
       required: true,
     },
   ],
   vehicle: [
     {
+      id: "fullName",
+      text: "What is your full name?",
+      type: "text",
+      placeholder: "Enter your full name",
+      required: true,
+    },
+    {
+      id: "contactNumber",
+      text: "What is your contact number?",
+      type: "text",
+      placeholder: "Enter your mobile number",
+      required: true,
+    },
+    {
       id: "vehicleType",
       text: "What type of vehicle do you have?",
       type: "select",
-      options: ["Two wheeler", "Four wheeler", "Commercial vehicle"],
+      options: ["Two wheeler", "Four wheeler - Private Car", "Four wheeler - SUV", "Commercial vehicle"],
+      required: true,
+    },
+    {
+      id: "makeModel",
+      text: "What is the make and model of your vehicle?",
+      type: "text",
+      placeholder: "E.g., Maruti Suzuki Swift, Honda Activa",
+      required: true,
+    },
+    {
+      id: "registrationNumber",
+      text: "What is your vehicle registration number?",
+      type: "text",
+      placeholder: "E.g., MH01AB1234",
+      required: true,
+    },
+    {
+      id: "purchaseDate",
+      text: "When did you purchase your vehicle?",
+      type: "date",
       required: true,
     },
     {
@@ -109,6 +241,13 @@ export const questions: Record<InsuranceType, Question[]> = {
       required: true,
     },
     {
+      id: "previousInsurer",
+      text: "Who was your previous insurer (if any)?",
+      type: "select",
+      options: ["None/First time", "ICICI Lombard", "HDFC ERGO", "Bajaj Allianz", "Tata AIG", "New India Assurance", "Other"],
+      required: true,
+    },
+    {
       id: "previousClaims",
       text: "Have you made any insurance claims in the last 3 years?",
       type: "radio",
@@ -116,10 +255,17 @@ export const questions: Record<InsuranceType, Question[]> = {
       required: true,
     },
     {
+      id: "claimDetails",
+      text: "If yes, please specify the nature of claims",
+      type: "text",
+      placeholder: "E.g., Accident repair, Theft, etc.",
+      required: false,
+    },
+    {
       id: "coverageType",
       text: "What type of coverage are you looking for?",
       type: "select",
-      options: ["Third party only", "Comprehensive", "Zero depreciation"],
+      options: ["Third party only", "Comprehensive", "Zero depreciation", "Own damage"],
       required: true,
     },
   ],
@@ -134,6 +280,7 @@ export interface InsurancePlan {
   premium: number;
   highlights: string[];
   rating: number;
+  link: string; // Added link field for redirection
 }
 
 export const getRecommendedPlans = (
@@ -158,6 +305,7 @@ export const getRecommendedPlans = (
           "Covers pre-existing diseases after 3 years"
         ],
         rating: 4.5,
+        link: "https://www.maxbupa.com/health-insurance-plans"
       },
       {
         id: "h2",
@@ -172,6 +320,7 @@ export const getRecommendedPlans = (
           "Free annual health check-up"
         ],
         rating: 4.2,
+        link: "https://www.hdfcergo.com/health-insurance"
       },
       {
         id: "h3",
@@ -186,6 +335,7 @@ export const getRecommendedPlans = (
           "Special discounts for healthy lifestyle"
         ],
         rating: 4.0,
+        link: "https://www.starhealth.in/senior-citizen-health-insurance"
       },
     ],
     term: [
@@ -202,6 +352,7 @@ export const getRecommendedPlans = (
           "Tax benefits under Section 80C"
         ],
         rating: 4.7,
+        link: "https://www.iciciprulife.com/term-insurance-plans/isecure-smart-term-plan.html"
       },
       {
         id: "t2",
@@ -216,6 +367,7 @@ export const getRecommendedPlans = (
           "Return of premium option"
         ],
         rating: 4.4,
+        link: "https://www.hdfclife.com/term-insurance-plans"
       },
       {
         id: "t3",
@@ -230,6 +382,7 @@ export const getRecommendedPlans = (
           "98.74% claim settlement ratio"
         ],
         rating: 4.3,
+        link: "https://www.maxlifeinsurance.com/term-insurance-plans"
       },
     ],
     vehicle: [
@@ -246,6 +399,7 @@ export const getRecommendedPlans = (
           "No claim bonus protection"
         ],
         rating: 4.6,
+        link: "https://www.bajajallianz.com/motor-insurance.html"
       },
       {
         id: "v2",
@@ -260,6 +414,7 @@ export const getRecommendedPlans = (
           "No claim bonus upto 50%"
         ],
         rating: 4.3,
+        link: "https://www.icicilombard.com/motor-insurance"
       },
       {
         id: "v3",
@@ -274,6 +429,7 @@ export const getRecommendedPlans = (
           "Quick policy issuance"
         ],
         rating: 4.1,
+        link: "https://www.hdfcergo.com/two-wheeler-insurance"
       },
     ],
   };

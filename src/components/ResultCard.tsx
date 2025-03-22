@@ -1,6 +1,6 @@
 
 import { motion } from "framer-motion";
-import { Award, Check, Sparkles } from "lucide-react";
+import { Award, Check, ExternalLink, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { InsurancePlan } from "@/lib/insuranceData";
 import { InsuranceType } from "@/components/InsuranceTypeCard";
@@ -13,6 +13,11 @@ interface ResultCardProps {
 }
 
 const ResultCard = ({ plan, index, insuranceType, isTopPick = false }: ResultCardProps) => {
+  const handleGetQuote = () => {
+    // Open the provider's website in a new tab
+    window.open(plan.link, "_blank");
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -76,11 +81,14 @@ const ResultCard = ({ plan, index, insuranceType, isTopPick = false }: ResultCar
           <Button 
             variant="outline" 
             className="flex-1"
+            onClick={() => window.open(plan.link, "_blank")}
           >
-            View Details
+            <span>View Details</span>
+            <ExternalLink className="w-3.5 h-3.5 ml-1.5" />
           </Button>
           <Button 
-            className={`flex-1 bg-insurance-${insuranceType}`}
+            className={`flex-1 bg-insurance-${insuranceType} hover:bg-insurance-${insuranceType}/90`}
+            onClick={handleGetQuote}
           >
             Get Quote
           </Button>

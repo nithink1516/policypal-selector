@@ -32,6 +32,23 @@ const QuestionnaireForm = ({ insuranceType, onSubmit, onBack }: QuestionnaireFor
     setAnswers((prev) => ({ ...prev, [questionId]: answer }));
   };
 
+  const shouldShowQuestion = (questionId: string): boolean => {
+    // Logic to determine if a question should be shown based on previous answers
+    if (questionId === "preExistingDetails") {
+      return answers["preExistingConditions"] === "Yes";
+    }
+    if (questionId === "medicalDetails") {
+      return answers["medicalHistory"] === "Yes";
+    }
+    if (questionId === "claimDetails") {
+      return answers["previousClaims"] === "Yes";
+    }
+    if (questionId === "familyAges") {
+      return answers["familySize"] && parseInt(answers["familySize"]) > 1;
+    }
+    return true;
+  };
+
   const nextStep = () => {
     if (currentQuestion.required && !answers[currentQuestion.id]) {
       toast({
@@ -45,7 +62,21 @@ const QuestionnaireForm = ({ insuranceType, onSubmit, onBack }: QuestionnaireFor
     if (isLastStep) {
       onSubmit(answers);
     } else {
-      setCurrentStep((prev) => prev + 1);
+      // Find the next valid question to show
+      let nextStepIndex = currentStep + 1;
+      while (
+        nextStepIndex < totalSteps && 
+        !shouldShowQuestion(questionsList[nextStepIndex].id)
+      ) {
+        nextStepIndex++;
+      }
+      
+      if (nextStepIndex < totalSteps) {
+        setCurrentStep(nextStepIndex);
+      } else {
+        // If no more valid questions, submit
+        onSubmit(answers);
+      }
     }
   };
 
@@ -53,9 +84,28 @@ const QuestionnaireForm = ({ insuranceType, onSubmit, onBack }: QuestionnaireFor
     if (currentStep === 0) {
       onBack();
     } else {
-      setCurrentStep((prev) => prev - 1);
+      // Find the previous valid question
+      let prevStepIndex = currentStep - 1;
+      while (
+        prevStepIndex >= 0 && 
+        !shouldShowQuestion(questionsList[prevStepIndex].id)
+      ) {
+        prevStepIndex--;
+      }
+      
+      if (prevStepIndex >= 0) {
+        setCurrentStep(prevStepIndex);
+      } else {
+        onBack();
+      }
     }
   };
+
+  // Skip questions that shouldn't be shown
+  if (currentStep < totalSteps && !shouldShowQuestion(currentQuestion.id)) {
+    nextStep();
+    return null;
+  }
 
   const renderQuestion = (question: Question) => {
     switch (question.type) {
@@ -177,7 +227,7 @@ const QuestionnaireForm = ({ insuranceType, onSubmit, onBack }: QuestionnaireFor
         
         <Button
           onClick={nextStep}
-          className={`flex items-center gap-2 bg-insurance-${insuranceType}`}
+          className={`flex items-center gap-2 bg-insurance-${insuranceType} hover:bg-insurance-${insuranceType}/90`}
         >
           {isLastStep ? (
             <>

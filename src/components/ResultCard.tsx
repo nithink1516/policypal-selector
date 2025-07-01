@@ -2,7 +2,7 @@
 import { motion } from "framer-motion";
 import { Award, Check, ExternalLink, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { InsurancePlan } from "@/lib/insuranceData";
+import { InsurancePlan } from "@/lib/insuranceApi";
 import { InsuranceType } from "@/components/InsuranceTypeCard";
 
 interface ResultCardProps {

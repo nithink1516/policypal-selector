@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import Layout from "@/components/Layout";
@@ -7,7 +8,7 @@ import { InsurancePlan, getAIRecommendedPlans } from "@/lib/insuranceApi";
 import AnimatedTransition from "@/components/AnimatedTransition";
 import { Button } from "@/components/ui/button";
 import { Home, RefreshCw, AlertCircle } from "lucide-react";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 
 const ResultsPage = () => {
   const navigate = useNavigate();

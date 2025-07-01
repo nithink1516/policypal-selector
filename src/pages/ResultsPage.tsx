@@ -4,16 +4,19 @@ import { useNavigate, useParams } from "react-router-dom";
 import Layout from "@/components/Layout";
 import ResultCard from "@/components/ResultCard";
 import { InsuranceType } from "@/components/InsuranceTypeCard";
-import { InsurancePlan, getRecommendedPlans } from "@/lib/insuranceData";
+import { InsurancePlan, getAIRecommendedPlans } from "@/lib/insuranceApi";
 import AnimatedTransition from "@/components/AnimatedTransition";
 import { Button } from "@/components/ui/button";
-import { Home, RefreshCw } from "lucide-react";
+import { Home, RefreshCw, AlertCircle } from "lucide-react";
+import { useToast } from "@/components/ui/use-toast";
 
 const ResultsPage = () => {
   const navigate = useNavigate();
   const { type } = useParams<{ type: string }>();
   const [plans, setPlans] = useState<InsurancePlan[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const { toast } = useToast();
   
   // Validate insurance type from URL
   const insuranceType = type as InsuranceType;
@@ -25,16 +28,35 @@ const ResultsPage = () => {
   }
 
   useEffect(() => {
-    // Simulate loading time to enhance user experience
-    const timer = setTimeout(() => {
-      const answers = JSON.parse(sessionStorage.getItem("insuranceAnswers") || "{}");
-      const recommendedPlans = getRecommendedPlans(insuranceType, answers);
-      setPlans(recommendedPlans);
-      setLoading(false);
-    }, 1500);
+    const fetchRecommendations = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        
+        const answers = JSON.parse(sessionStorage.getItem("insuranceAnswers") || "{}");
+        
+        if (Object.keys(answers).length === 0) {
+          navigate(`/questionnaire/${insuranceType}`);
+          return;
+        }
 
-    return () => clearTimeout(timer);
-  }, [insuranceType]);
+        const aiPlans = await getAIRecommendedPlans(insuranceType, answers);
+        setPlans(aiPlans);
+      } catch (err) {
+        console.error('Error fetching AI recommendations:', err);
+        setError('Failed to get personalized recommendations. Please try again.');
+        toast({
+          title: "Error",
+          description: "Failed to get personalized recommendations. Please try again.",
+          variant: "destructive",
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchRecommendations();
+  }, [insuranceType, navigate, toast]);
 
   const handleStartOver = () => {
     // Clear stored answers
@@ -42,22 +64,40 @@ const ResultsPage = () => {
     navigate("/");
   };
 
+  const handleRetry = () => {
+    const answers = JSON.parse(sessionStorage.getItem("insuranceAnswers") || "{}");
+    if (Object.keys(answers).length === 0) {
+      navigate(`/questionnaire/${insuranceType}`);
+    } else {
+      window.location.reload();
+    }
+  };
+
   return (
     <Layout>
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-12">
           <h1 className="text-4xl font-semibold tracking-tight mb-4">
-            Your Recommended Insurance Plans
+            Your AI-Powered Insurance Recommendations
           </h1>
           <p className="text-xl text-muted-foreground">
-            Based on your answers, we've found these options that best match your needs.
+            Based on your answers, our AI has analyzed and found these personalized options for you.
           </p>
         </div>
 
         {loading ? (
           <div className="flex flex-col items-center justify-center py-16">
             <div className={`w-16 h-16 rounded-full border-4 border-insurance-${insuranceType} border-t-transparent animate-spin mb-6`} />
-            <p className="text-lg font-medium">Finding the best plans for you...</p>
+            <p className="text-lg font-medium">AI is analyzing your profile and finding the best plans...</p>
+            <p className="text-sm text-muted-foreground mt-2">This may take a few moments</p>
+          </div>
+        ) : error ? (
+          <div className="flex flex-col items-center justify-center py-16">
+            <AlertCircle className="w-16 h-16 text-red-500 mb-6" />
+            <p className="text-lg font-medium text-red-600 mb-4">{error}</p>
+            <Button onClick={handleRetry} className="mb-4">
+              Try Again
+            </Button>
           </div>
         ) : (
           <AnimatedTransition>

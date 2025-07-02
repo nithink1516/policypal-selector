@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { InsuranceType } from "@/components/InsuranceTypeCard";
 import { Question, questions } from "@/lib/insuranceData";
 import AnimatedTransition from "./AnimatedTransition";
@@ -227,7 +227,7 @@ const QuestionnaireForm = ({ insuranceType, onSubmit, onBack }: QuestionnaireFor
         
         <Button
           onClick={nextStep}
-          className={`flex items-center gap-2 bg-insurance-${insuranceType} hover:bg-insurance-${insuranceType}/90`}
+          className="flex items-center gap-2"
         >
           {isLastStep ? (
             <>

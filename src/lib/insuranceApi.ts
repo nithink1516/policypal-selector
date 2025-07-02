@@ -20,6 +20,9 @@ export const getAIRecommendedPlans = async (
   answers: Record<string, any>
 ): Promise<InsurancePlan[]> => {
   try {
+    console.log('Making API call to:', `${SUPABASE_URL}/functions/v1/get-insurance-recommendations`);
+    console.log('Request payload:', { insuranceType, answers });
+    
     const response = await fetch(`${SUPABASE_URL}/functions/v1/get-insurance-recommendations`, {
       method: 'POST',
       headers: {
@@ -32,11 +35,17 @@ export const getAIRecommendedPlans = async (
       })
     });
 
+    console.log('Response status:', response.status);
+    console.log('Response ok:', response.ok);
+
     if (!response.ok) {
+      const errorText = await response.text();
+      console.error('Error response:', errorText);
       throw new Error('Failed to get AI recommendations');
     }
 
     const data = await response.json();
+    console.log('Response data:', data);
     return data.recommendations || [];
   } catch (error) {
     console.error('Error getting AI recommendations:', error);

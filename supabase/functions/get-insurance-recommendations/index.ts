@@ -13,11 +13,15 @@ serve(async (req) => {
   }
 
   try {
+    console.log('Edge function called with method:', req.method)
     const { insuranceType, answers } = await req.json()
+    console.log('Request data:', { insuranceType, answers })
     
     // Get OpenAI API key from Supabase secrets
     const openaiApiKey = Deno.env.get('OPENAI_API_KEY')
+    console.log('OpenAI API key exists:', !!openaiApiKey)
     if (!openaiApiKey) {
+      console.error('OpenAI API key not found in environment variables')
       throw new Error('OpenAI API key not found in environment variables')
     }
 

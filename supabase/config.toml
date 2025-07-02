@@ -1,1 +1,4 @@
 project_id = "quzpssxbqwycpctlmsyv"
+
+[functions.get-insurance-recommendations]
+verify_jwt = false

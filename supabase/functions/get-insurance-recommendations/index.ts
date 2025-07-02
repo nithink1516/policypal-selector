@@ -1,6 +1,6 @@
 
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import "https://deno.land/x/xhr@0.1.0/mod.ts";
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -17,13 +17,49 @@ serve(async (req) => {
     const { insuranceType, answers } = await req.json()
     console.log('Request data:', { insuranceType, answers })
     
-    // Get OpenAI API key from Supabase secrets
-    const openaiApiKey = Deno.env.get('OPENAI_API_KEY')
-    console.log('OpenAI API key exists:', !!openaiApiKey)
-    if (!openaiApiKey) {
-      console.error('OpenAI API key not found in environment variables')
-      throw new Error('OpenAI API key not found in environment variables')
-    }
+    // For now, let's return mock data to test the function
+    console.log('Creating mock recommendations...')
+    
+    const mockRecommendations = [
+      {
+        id: "hdfc_health_1",
+        name: "HDFC ERGO Health Suraksha",
+        provider: "HDFC ERGO",
+        coverage: "₹5,00,000",
+        premium: 12000,
+        highlights: ["Cashless treatment", "Pre & post hospitalization", "Day care procedures", "No room rent limit"],
+        rating: 4.5,
+        link: "https://www.hdfcergo.com/health-insurance"
+      },
+      {
+        id: "icici_health_1",
+        name: "ICICI Lombard Complete Health",
+        provider: "ICICI Lombard",
+        coverage: "₹3,00,000",
+        premium: 8500,
+        highlights: ["Worldwide coverage", "Pre-existing diseases", "Maternity benefits", "Health check-up"],
+        rating: 4.3,
+        link: "https://www.icicilombard.com/health-insurance"
+      },
+      {
+        id: "bajaj_health_1", 
+        name: "Bajaj Allianz Health Guard",
+        provider: "Bajaj Allianz",
+        coverage: "₹4,00,000",
+        premium: 10000,
+        highlights: ["Family floater", "No co-payment", "Cumulative bonus", "Emergency assistance"],
+        rating: 4.2,
+        link: "https://www.bajajallianz.com/health-insurance"
+      }
+    ]
+
+    return new Response(
+      JSON.stringify({ recommendations: mockRecommendations }),
+      {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 200,
+      },
+    )
 
     // Create a detailed prompt based on user answers
     const prompt = createInsurancePrompt(insuranceType, answers)

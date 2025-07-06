@@ -17,41 +17,11 @@ serve(async (req) => {
     const { insuranceType, answers } = await req.json()
     console.log('Request data:', { insuranceType, answers })
     
-    // For now, let's return mock data to test the function
-    console.log('Creating mock recommendations...')
+    // Generate personalized recommendations based on insurance type and user answers
+    console.log('Creating personalized recommendations for:', insuranceType)
+    console.log('User answers:', answers)
     
-    const mockRecommendations = [
-      {
-        id: "hdfc_health_1",
-        name: "HDFC ERGO Health Suraksha",
-        provider: "HDFC ERGO",
-        coverage: "₹5,00,000",
-        premium: 12000,
-        highlights: ["Cashless treatment", "Pre & post hospitalization", "Day care procedures", "No room rent limit"],
-        rating: 4.5,
-        link: "https://www.hdfcergo.com/health-insurance"
-      },
-      {
-        id: "icici_health_1",
-        name: "ICICI Lombard Complete Health",
-        provider: "ICICI Lombard",
-        coverage: "₹3,00,000",
-        premium: 8500,
-        highlights: ["Worldwide coverage", "Pre-existing diseases", "Maternity benefits", "Health check-up"],
-        rating: 4.3,
-        link: "https://www.icicilombard.com/health-insurance"
-      },
-      {
-        id: "bajaj_health_1", 
-        name: "Bajaj Allianz Health Guard",
-        provider: "Bajaj Allianz",
-        coverage: "₹4,00,000",
-        premium: 10000,
-        highlights: ["Family floater", "No co-payment", "Cumulative bonus", "Emergency assistance"],
-        rating: 4.2,
-        link: "https://www.bajajallianz.com/health-insurance"
-      }
-    ]
+    const mockRecommendations = generatePersonalizedRecommendations(insuranceType, answers)
 
     return new Response(
       JSON.stringify({ recommendations: mockRecommendations }),
@@ -61,55 +31,6 @@ serve(async (req) => {
       },
     )
 
-    // Create a detailed prompt based on user answers
-    const prompt = createInsurancePrompt(insuranceType, answers)
-
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${openaiApiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'gpt-4.1-2025-04-14',
-        messages: [
-          {
-            role: 'system',
-            content: 'You are an expert insurance advisor in India. Provide personalized insurance recommendations based on user details. Always respond with valid JSON format containing an array of insurance plans.'
-          },
-          {
-            role: 'user',
-            content: prompt
-          }
-        ],
-        temperature: 0.3,
-        max_tokens: 2000,
-      }),
-    })
-
-    if (!response.ok) {
-      throw new Error(`OpenAI API error: ${response.statusText}`)
-    }
-
-    const data = await response.json()
-    const aiResponse = data.choices[0].message.content
-
-    // Parse the AI response and structure it
-    let recommendations
-    try {
-      recommendations = JSON.parse(aiResponse)
-    } catch (e) {
-      // If AI doesn't return valid JSON, create a structured response
-      recommendations = parseUnstructuredResponse(aiResponse, insuranceType)
-    }
-
-    return new Response(
-      JSON.stringify({ recommendations }),
-      {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 200,
-      },
-    )
   } catch (error) {
     console.error('Error:', error)
     return new Response(
@@ -175,4 +96,183 @@ function parseUnstructuredResponse(response: string, insuranceType: string): any
   })
   
   return plans
+}
+
+function generatePersonalizedRecommendations(insuranceType: string, answers: any): any[] {
+  const age = parseInt(answers.age) || 30
+  const income = parseInt(answers.income) || 500000
+  const familySize = parseInt(answers.familySize) || 1
+  
+  if (insuranceType === 'health') {
+    const baseCoverage = Math.min(Math.max(income * 2, 300000), 1000000)
+    const basePremium = Math.floor(baseCoverage * 0.02)
+    
+    return [
+      {
+        id: "hdfc_health_personalized",
+        name: "HDFC ERGO Health Suraksha Gold",
+        provider: "HDFC ERGO",
+        coverage: `₹${(baseCoverage).toLocaleString('en-IN')}`,
+        premium: basePremium,
+        highlights: [
+          "Cashless treatment at 10,000+ hospitals",
+          familySize > 1 ? "Family floater coverage" : "Individual coverage",
+          age > 40 ? "Pre-existing disease coverage" : "Day care procedures",
+          "No room rent limit"
+        ],
+        rating: 4.5,
+        link: "https://www.hdfcergo.com/health-insurance"
+      },
+      {
+        id: "icici_health_personalized",
+        name: "ICICI Lombard Complete Health Insurance",
+        provider: "ICICI Lombard", 
+        coverage: `₹${(baseCoverage * 0.8).toLocaleString('en-IN')}`,
+        premium: Math.floor(basePremium * 0.85),
+        highlights: [
+          "Worldwide emergency coverage",
+          age > 35 ? "Senior citizen friendly" : "Young professional benefits",
+          familySize > 2 ? "Maternity benefits" : "Health check-ups included",
+          "Online claim settlement"
+        ],
+        rating: 4.3,
+        link: "https://www.icicilombard.com/health-insurance"
+      },
+      {
+        id: "bajaj_health_personalized",
+        name: "Bajaj Allianz Health Guard",
+        provider: "Bajaj Allianz",
+        coverage: `₹${(baseCoverage * 1.2).toLocaleString('en-IN')}`,
+        premium: Math.floor(basePremium * 1.1),
+        highlights: [
+          familySize > 1 ? "Family floater option" : "Individual comprehensive cover",
+          "No co-payment clause",
+          "Cumulative bonus up to 100%",
+          income > 800000 ? "Premium tax benefits" : "Affordable premium"
+        ],
+        rating: 4.2,
+        link: "https://www.bajajallianz.com/health-insurance"
+      }
+    ]
+  }
+  
+  if (insuranceType === 'term') {
+    const coverageMultiplier = age < 35 ? 15 : age < 45 ? 12 : 10
+    const termCoverage = Math.min(income * coverageMultiplier, 10000000)
+    const termPremium = Math.floor(termCoverage * 0.001 * (age < 30 ? 0.8 : age < 40 ? 1.2 : 1.8))
+    
+    return [
+      {
+        id: "hdfc_term_personalized",
+        name: "HDFC Life Click 2 Protect Plus",
+        provider: "HDFC Life",
+        coverage: `₹${termCoverage.toLocaleString('en-IN')}`,
+        premium: termPremium,
+        highlights: [
+          "Pure term insurance",
+          age < 35 ? "Young age benefits" : "Comprehensive coverage",
+          "Accidental death benefit",
+          familySize > 1 ? "Family income protection" : "Individual security"
+        ],
+        rating: 4.4,
+        link: "https://www.hdfclife.com/term-insurance"
+      },
+      {
+        id: "icici_term_personalized",
+        name: "ICICI Pru iProtect Smart",
+        provider: "ICICI Prudential",
+        coverage: `₹${(termCoverage * 0.9).toLocaleString('en-IN')}`,
+        premium: Math.floor(termPremium * 0.95),
+        highlights: [
+          "Increasing life cover option",
+          "Premium return option",
+          age > 40 ? "Maturity age up to 80" : "Long-term protection",
+          "Terminal illness benefit"
+        ],
+        rating: 4.3,
+        link: "https://www.iciciprulife.com/term-insurance"
+      },
+      {
+        id: "bajaj_term_personalized",
+        name: "Bajaj Allianz eTouch Online Term",
+        provider: "Bajaj Allianz Life",
+        coverage: `₹${(termCoverage * 1.1).toLocaleString('en-IN')}`,
+        premium: Math.floor(termPremium * 1.05),
+        highlights: [
+          "100% online process",
+          "Flexible premium payment",
+          income > 1000000 ? "High sum assured available" : "Affordable premiums",
+          "Critical illness rider"
+        ],
+        rating: 4.1,
+        link: "https://www.bajajallianzlife.com/term-insurance"
+      }
+    ]
+  }
+  
+  if (insuranceType === 'vehicle') {
+    const vehicleValue = parseInt(answers.vehicleValue) || 800000
+    const vehicleAge = parseInt(answers.vehicleAge) || 0
+    const vehiclePremium = Math.floor(vehicleValue * (vehicleAge < 3 ? 0.03 : vehicleAge < 7 ? 0.04 : 0.05))
+    
+    return [
+      {
+        id: "hdfc_vehicle_personalized",
+        name: "HDFC ERGO Motor Insurance",
+        provider: "HDFC ERGO",
+        coverage: `₹${vehicleValue.toLocaleString('en-IN')} IDV`,
+        premium: vehiclePremium,
+        highlights: [
+          "Comprehensive coverage",
+          vehicleAge < 5 ? "Zero depreciation cover" : "Standard depreciation",
+          "24x7 roadside assistance",
+          age < 25 ? "Young driver support" : "Experienced driver benefits"
+        ],
+        rating: 4.4,
+        link: "https://www.hdfcergo.com/motor-insurance"
+      },
+      {
+        id: "icici_vehicle_personalized",
+        name: "ICICI Lombard Car Insurance",
+        provider: "ICICI Lombard",
+        coverage: `₹${(vehicleValue * 0.95).toLocaleString('en-IN')} IDV`,
+        premium: Math.floor(vehiclePremium * 0.9),
+        highlights: [
+          "Quick claim settlement",
+          "Engine protection cover",
+          vehicleAge > 5 ? "Older vehicle specialist" : "New car protection",
+          "Cashless garage network"
+        ],
+        rating: 4.2,
+        link: "https://www.icicilombard.com/motor-insurance"
+      },
+      {
+        id: "bajaj_vehicle_personalized",
+        name: "Bajaj Allianz Motor Insurance",
+        provider: "Bajaj Allianz",
+        coverage: `₹${(vehicleValue * 1.05).toLocaleString('en-IN')} IDV`,
+        premium: Math.floor(vehiclePremium * 1.1),
+        highlights: [
+          "Return to invoice cover",
+          "Personal accident cover",
+          vehicleValue > 1000000 ? "Luxury car specialist" : "Value for money",
+          "Digital claim process"
+        ],
+        rating: 4.0,
+        link: "https://www.bajajallianz.com/motor-insurance"
+      }
+    ]
+  }
+  
+  // Fallback for unknown insurance types
+  return [{
+    id: "generic_plan_1",
+    name: "Generic Insurance Plan",
+    provider: "Insurance Provider",
+    coverage: "Standard Coverage",
+    premium: 10000,
+    highlights: ["Basic coverage", "Standard benefits", "Reliable service", "Customer support"],
+    rating: 4.0,
+    link: "https://example.com"
+  }]
 }
